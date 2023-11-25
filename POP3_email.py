@@ -4,12 +4,33 @@ import os
 def getFileName(s): 
     return s[s.find('"')+1:len(s)-1]
 
+# def filter_write(content,path_folder):
+#     file_name=content[content.find('Subject: ')+9:content.find('From: ')-2]
+#     file_name+='.txt'
+#     file_path=os.path.join(path_folder, file_name)
+#     with open(file_path, 'w') as attachment_file:
+#         attachment_file.write(content)    
+    
+def danh_sach_thu_muc(duong_dan):
+    danh_sach_thu_muc = []
+    for ten in os.listdir(duong_dan):
+        duong_dan_day_du = os.path.join(duong_dan, ten)
+        if os.path.isdir(duong_dan_day_du):
+            danh_sach_thu_muc.append(ten)
+    return danh_sach_thu_muc
+    
 def filter_write(content,path_folder):
-    file_name=content[content.find('Subject: ')+9:content.find('From: ')-2]
-    file_name+='.txt'
-    file_path=os.path.join(path_folder, file_name)
-    with open(file_path, 'w') as attachment_file:
-        attachment_file.write(content)    
+    amount_message_cur = len(danh_sach_thu_muc(path_folder))
+    newFolder = 'Message ' + str(amount_message_cur +1 ) 
+    path_newFolder = os.path.join(path_folder,newFolder) 
+    if not os.path.exists(path_newFolder):
+        os.makedirs(path_newFolder)
+    newFile = content[content.find('Subject: ')+9:content.find('From: ')-2]
+    newFile += '.txt'
+    path_newFile = os.path.join(path_newFolder, newFile)
+    with open(path_newFile, 'w') as attachment_file:
+        attachment_file.write(content)  
+        print(f"Tệp tin '{newFile}' đã được tạo trong thư mục '{newFolder}'.")   
     
 def folder_filtering(content,project_keywords,important_keywords,work_keywords,spam_keywords,):
     From = content[content.find('From: ') + 6:content.find('To: ') - 2]
