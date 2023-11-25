@@ -83,7 +83,9 @@ def retrieve_email_with_attachment_socket( username, password):
 
 
             email_content_list=email.split('\r\n\r\n')
-            
+
+            ##  xử lí file config  ##
+
             project_keywords ={'ahihi@testing.com', 'ahuu@testing.com'}
             important_keywords={"urgent", "ASAP"}
             work_keywords={"report", "meeting"}
@@ -94,9 +96,9 @@ def retrieve_email_with_attachment_socket( username, password):
             paths_folder = folder_filtering(email_content,project_keywords,important_keywords,work_keywords,spam_keywords)
             for path in paths_folder:
                 print(path)
-                pathMessage = path_message(path)
+                pathMessage = path_message(path) # tạo folder message mới 
                 newFile = email_content[email_content.find('Subject: ')+9:email_content.find('From: ')-2]
-                newFile += '.txt'    
+                   
                 path_newFile = os.path.join(pathMessage,newFile)
                 with open(path_newFile, 'w') as attachment_file:
                     attachment_file.write(email_content)  
