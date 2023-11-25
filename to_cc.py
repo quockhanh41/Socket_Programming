@@ -91,11 +91,11 @@ def send_email_to_cc_with_attachments(sender_email, to_email_list, cc_email_list
         print(response)
 
 # Example usage:
-send_email_to_cc_with_attachments(
-    sender_email="qknetwork41@gmail.com",
-    to_email_list=["qknetwork41@gmail.com"],
-    cc_email_list=["qk1@gmail.com", "qk2@gmail.com"],
-    subject="Subject of the email",
-    body="Body of the email",
-    attachment_paths=["D:\cmd.txt","D:\W06-Polymophism.pdf","D:\All logo.pdf"]
-)
+# send_email_to_cc_with_attachments(
+#     sender_email="qknetwork41@gmail.com",
+#     to_email_list=["qknetwork41@gmail.com"],
+#     cc_email_list=["qk1@gmail.com", "qk2@gmail.com"],
+#     subject="Subject of the email",
+#     body="Body of the email",
+#     attachment_paths=["D:\cmd.txt","D:\W06-Polymophism.pdf","D:\All logo.pdf"]
+# )

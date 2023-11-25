@@ -1,6 +1,8 @@
 from bcc import send_email_bcc_with_attachments
 from to_cc import send_email_to_cc_with_attachments
-
+from path_handling import danh_sach_thu_muc
+from path_handling import view_all_message
+import os
 class EmailClient:
     def __init__(self):
         self.inbox = []
@@ -24,9 +26,11 @@ class EmailClient:
             print("Đã gửi email thành công")
 
     def view_inbox(self):
-        print("Đây là danh sách email trong Inbox folder")
-        for i, email in enumerate(self.inbox, start=1):
-            print(f"{i}. {email.sender}, {email.subject}")
+        print("Đây là danh sách các folder trong mailbox của bạn: ")
+        listFolder = danh_sach_thu_muc(r"D:\MailBox")
+        for i in range(0,len(listFolder)):
+            print(i+1,listFolder[i])
+        
 
     def read_email(self, index):
         email = self.inbox[index - 1]
@@ -53,14 +57,17 @@ class EmailClient:
                 self.send_email()
             elif choice == '2':
                 self.view_inbox()
-                folder_choice = input("Bạn muốn xem email trong folder nào: ")
-                if folder_choice == '':
-                    continue
-                folder_index = int(folder_choice)
-                if 1 <= folder_index <= len(self.inbox):
-                    self.read_email(folder_index)
-                else:
-                    print("Không có email nào trong folder này.")
+                choice = int(input("Bạn muốn xem email trong folder nào: "))
+                listFolder = danh_sach_thu_muc(r"D:\MailBox")
+                path_folder = os.path.join(r"D:\MailBox",listFolder[choice-1])
+                print(path_folder)
+                # if folder_choice == '':
+                #     continue
+                # folder_index = int(folder_choice)
+                # if 1 <= folder_index <= len(self.inbox):
+                #     self.read_email(folder_index)
+                # else:
+                #     print("Không có email nào trong folder này.")
             elif choice == '3':
                 break
             else:

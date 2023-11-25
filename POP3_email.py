@@ -1,51 +1,12 @@
 import socket
 import base64
 import os
+from path_handling import path_message
+from path_handling import folder_filtering
+
+
 def getAttachmentName(s): 
     return s[s.find('"')+1:len(s)-1]
-   
-def danh_sach_thu_muc(duong_dan):
-    danh_sach_thu_muc = []
-    for ten in os.listdir(duong_dan):
-        duong_dan_day_du = os.path.join(duong_dan, ten)
-        if os.path.isdir(duong_dan_day_du):
-            danh_sach_thu_muc.append(ten)
-    return danh_sach_thu_muc
-    
-def path_message(path_folder):
-    amount_message_cur = len(danh_sach_thu_muc(path_folder))
-    newFolder = 'Message ' + str(amount_message_cur +1 ) 
-    path_newFolder = os.path.join(path_folder,newFolder) 
-    if not os.path.exists(path_newFolder):
-        os.makedirs(path_newFolder)
-    return path_newFolder
-    
-    
-def folder_filtering(content,project_keywords,important_keywords,work_keywords,spam_keywords):
-    list_folder=[]
-    From = content[content.find('From: ') + 6:content.find('To: ') - 2]
-    Subject = content[content.find('Subject: ') + 9:content.find('From: ') - 2]
-    Body = content[content.find('Content: ') + 9:]
-    for project_keyword in project_keywords:
-        if From == project_keyword:
-            list_folder.append(r"D:\MailBox\Project\Unread")
-            break
-    for important_keyword in important_keywords:
-        if Subject.find(important_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Important\Unread")
-            break
-    for work_keyword in work_keywords:
-        if Body.find(work_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Work\Unread")
-            break
-    for spam_keyword in spam_keywords:
-        if Body.find(spam_keyword)!= -1 or Subject.find(spam_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Spam\Unread")
-            break
-    if not list_folder:
-        list_folder.append(r"D:\MailBox\Inbox\Unread")
-    return list_folder
-
 
 def retrieve_email_with_attachment_socket( username, password):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pop_conn:
@@ -115,11 +76,11 @@ def retrieve_email_with_attachment_socket( username, password):
         response = pop_conn.recv(1024).decode()
         print(response)
 
-# Set your POP3 server details
+# # Set your POP3 server details
 
-pop3_username = 'qknetwork41@gmail.com'
-pop3_password = '25092004'  # Consider using app-specific password for security
+# pop3_username = 'qknetwork41@gmail.com'
+# pop3_password = '25092004'  # Consider using app-specific password for security
 
-# Call the retrieve_email_with_attachment_socket function
-retrieve_email_with_attachment_socket( pop3_username, pop3_password)
+# # Call the retrieve_email_with_attachment_socket function
+# retrieve_email_with_attachment_socket( pop3_username, pop3_password)
 

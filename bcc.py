@@ -77,10 +77,10 @@ def send_email_bcc_with_attachments(sender_email, recipient_email, subject, body
         response = client_socket.recv(1024).decode()
         print(response)
 
-send_email_bcc_with_attachments(
-    sender_email= "qknetwork41@gmail.com",
-    recipient_email="qknetwork41@gmail.com",
-    subject="Subject of the email",
-    body="Body of the email",
-    attachment_paths=[ "D:\cmd.txt","D:\W06-Polymophism.pdf"]
-)
+# send_email_bcc_with_attachments(
+#     sender_email= "qknetwork41@gmail.com",
+#     recipient_email="qknetwork41@gmail.com",
+#     subject="Subject of the email",
+#     body="Body of the email",
+#     attachment_paths=[ "D:\cmd.txt","D:\W06-Polymophism.pdf"]
+# )
