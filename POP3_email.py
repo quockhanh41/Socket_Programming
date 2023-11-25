@@ -1,16 +1,9 @@
 import socket
 import base64
 import os
-def getFileName(s): 
+def getAttachmentName(s): 
     return s[s.find('"')+1:len(s)-1]
-
-# def filter_write(content,path_folder):
-#     file_name=content[content.find('Subject: ')+9:content.find('From: ')-2]
-#     file_name+='.txt'
-#     file_path=os.path.join(path_folder, file_name)
-#     with open(file_path, 'w') as attachment_file:
-#         attachment_file.write(content)    
-    
+   
 def danh_sach_thu_muc(duong_dan):
     danh_sach_thu_muc = []
     for ten in os.listdir(duong_dan):
@@ -19,40 +12,40 @@ def danh_sach_thu_muc(duong_dan):
             danh_sach_thu_muc.append(ten)
     return danh_sach_thu_muc
     
-def filter_write(content,path_folder):
+def path_message(path_folder):
     amount_message_cur = len(danh_sach_thu_muc(path_folder))
     newFolder = 'Message ' + str(amount_message_cur +1 ) 
     path_newFolder = os.path.join(path_folder,newFolder) 
     if not os.path.exists(path_newFolder):
         os.makedirs(path_newFolder)
-    newFile = content[content.find('Subject: ')+9:content.find('From: ')-2]
-    newFile += '.txt'
-    path_newFile = os.path.join(path_newFolder, newFile)
-    with open(path_newFile, 'w') as attachment_file:
-        attachment_file.write(content)  
-        print(f"Tệp tin '{newFile}' đã được tạo trong thư mục '{newFolder}'.")   
+    return path_newFolder
     
-def folder_filtering(content,project_keywords,important_keywords,work_keywords,spam_keywords,):
+    
+def folder_filtering(content,project_keywords,important_keywords,work_keywords,spam_keywords):
+    list_folder=[]
     From = content[content.find('From: ') + 6:content.find('To: ') - 2]
     Subject = content[content.find('Subject: ') + 9:content.find('From: ') - 2]
     Body = content[content.find('Content: ') + 9:]
     for project_keyword in project_keywords:
         if From == project_keyword:
-            filter_write(content,r"D:\MailBox\Project\Unread")
-            continue
+            list_folder.append(r"D:\MailBox\Project\Unread")
+            break
     for important_keyword in important_keywords:
         if Subject.find(important_keyword) != -1:
-            filter_write(content,r"D:\MailBox\Important\Unread")
-            continue
+            list_folder.append(r"D:\MailBox\Important\Unread")
+            break
     for work_keyword in work_keywords:
         if Body.find(work_keyword) != -1:
-            filter_write(content,r"D:\MailBox\Work\Unread")
-            continue
+            list_folder.append(r"D:\MailBox\Work\Unread")
+            break
     for spam_keyword in spam_keywords:
-        if Body.find(spam_keyword)!= 1 or Subject.find(spam_keyword) != -1:
-            filter_write(content,r"D:\MailBox\Spam\Unread")
-            continue
-    filter_write(content,r"D:\MailBox\Inbox\Unread")
+        if Body.find(spam_keyword)!= -1 or Subject.find(spam_keyword) != -1:
+            list_folder.append(r"D:\MailBox\Spam\Unread")
+            break
+    if not list_folder:
+        list_folder.append(r"D:\MailBox\Inbox\Unread")
+    return list_folder
+
 
 def retrieve_email_with_attachment_socket( username, password):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pop_conn:
@@ -88,17 +81,32 @@ def retrieve_email_with_attachment_socket( username, password):
             lines=email.splitlines()
             email='\r\n'.join(lines[1:])
 
-            # print(email_content)
+
             email_content_list=email.split('\r\n\r\n')
             
+            project_keywords ={'ahihi@testing.com', 'ahuu@testing.com'}
+            important_keywords={"urgent", "ASAP"}
+            work_keywords={"report", "meeting"}
+            spam_keywords={"virus", "hack", "crack"}
+
             email_content = email_content_list[0] + '\r\nContent: ' + email_content_list[3]
-            folder_filtering(email_content,{'qknetwork41@gmail.com'})
-           
-            for i in range(4,len(email_content_list)-1 , 2):
-                fileName = getFileName(email_content_list[i])
-                with open(fileName, 'wb') as attachment_file:
-                    attachment_file.write(base64.b64decode(email_content_list[i+1]))   
-                    print(f"Attachment saved: {fileName}")
+
+            paths_folder = folder_filtering(email_content,project_keywords,important_keywords,work_keywords,spam_keywords)
+            for path in paths_folder:
+                print(path)
+                pathMessage = path_message(path)
+                newFile = email_content[email_content.find('Subject: ')+9:email_content.find('From: ')-2]
+                newFile += '.txt'    
+                path_newFile = os.path.join(pathMessage,newFile)
+                with open(path_newFile, 'w') as attachment_file:
+                    attachment_file.write(email_content)  
+
+                for i in range(4,len(email_content_list)-1 , 2):
+                    attachmentName = getAttachmentName(email_content_list[i])
+                    path_attachment = os.path.join(pathMessage,attachmentName)
+                    with open(path_attachment, 'wb') as attachment_file:
+                        attachment_file.write(base64.b64decode(email_content_list[i+1]))   
+                        print(f"Attachment saved: {attachmentName}")
                 
         # Quit the session
         pop_conn.sendall(b'QUIT\r\n')
