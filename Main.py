@@ -1,7 +1,15 @@
 from bcc import send_email_bcc_with_attachments
 from to_cc import send_email_to_cc_with_attachments
 from path_handling import danh_sach_thu_muc
-from path_handling import view_all_message
+from path_handling import print_MessageList
+from path_handling import print_message
+from path_handling import check_attachmentFile
+from path_handling import change_location_file
+from path_handling import count_messageInFolder
+
+
+
+
 import os
 class EmailClient:
     def __init__(self):
@@ -60,14 +68,34 @@ class EmailClient:
                 choice = int(input("Bạn muốn xem email trong folder nào: "))
                 listFolder = danh_sach_thu_muc(r"D:\MailBox")
                 path_folder = os.path.join(r"D:\MailBox",listFolder[choice-1])
-                print(path_folder)
+
+                if count_messageInFolder(path_folder) != 0:
+                    print_MessageList(path_folder)
+                    while True:
+                        choice = input("Bạn muốn đọc Email thứ mấy: ")
+                        if choice == 0 :
+                            print_MessageList(path_folder)
+                            continue
+                        elif choice == '':
+                            break
+                        choice = int(choice)
+                        print("Nội dung email của email thứ",choice)
+                        path_message = print_message(path_folder,choice)
+                        list_attachmentFile = check_attachmentFile(path_message)
+                        if list_attachmentFile:
+                            if input("Trong email này có attached file, bạn có muốn save không: ") == 'có':
+                                destination_path = input("Cho biết đường dẫn bạn muốn lưu: ")
+                                for path_file in list_attachmentFile:
+                                    change_location_file(path_file,destination_path)
+                else:
+                    print("Không có email nào trong folder này.")
+                
+
                 # if folder_choice == '':
                 #     continue
                 # folder_index = int(folder_choice)
                 # if 1 <= folder_index <= len(self.inbox):
                 #     self.read_email(folder_index)
-                # else:
-                #     print("Không có email nào trong folder này.")
             elif choice == '3':
                 break
             else:

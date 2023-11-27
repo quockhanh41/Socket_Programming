@@ -1,5 +1,6 @@
 import os
-   
+import shutil
+
 def danh_sach_thu_muc(duong_dan):
     danh_sach_thu_muc = []
     for ten in os.listdir(duong_dan):
@@ -47,7 +48,7 @@ def folder_filtering(content,project_keywords,important_keywords,work_keywords,s
         list_folder.append(r"D:\MailBox\Inbox\Unread")
     return list_folder
 
-def view_read_message(path_folder,i):
+def print_readMessageList(path_folder,i):
     fileList = danh_sach_tap_tin(path_folder)
     subjectFile=''
     for path in fileList:
@@ -64,7 +65,7 @@ def view_read_message(path_folder,i):
         sender = content[content.find('From: ')+6:content.find('To: ')-2]
         print(str(i)+'.',sender,subject)
 
-def view_unread_message(path_folder,i):
+def print_unreadMessageList(path_folder,i):
     fileList = danh_sach_tap_tin(path_folder)
     subjectFile=''
     for path in fileList:
@@ -78,26 +79,60 @@ def view_unread_message(path_folder,i):
         sender = content[content.find('From: ')+6:content.find('To: ')-2]
         print(str(i)+'. (chưa đọc)',sender,subject)
     
+def count_messageInFolder(path_folder):
+    count = 0
+    path_read = os.path.join(path_folder,"Read")
+    count += len(danh_sach_tap_tin(path_read))
+    path_unread = os.path.join(path_folder,"Unread")
+    count += len(danh_sach_tap_tin(path_unread))
+    return count
+
 # hiện trạng thái tn, ng gửi và subject tất cả các tin nhắn 
 # và trả lại đường dẫn tin nhắn muốn mở 
-def view_all_message(path_folder):
+def print_MessageList(path_folder):
     path_read = os.path.join(path_folder,"Read")
     read_list = danh_sach_thu_muc(path_read)
     i = 1
     for messageFolder in read_list:
         path_messageFolder = os.path.join(path_read,messageFolder)
-        view_read_message(path_messageFolder,i)
+        print_readMessageList(path_messageFolder,i)
         i+=1
     path_unread = os.path.join(path_folder,"Unread")
     unread_list = danh_sach_thu_muc(path_unread)
     for messageFolder in unread_list:
         path_messageFolder = os.path.join(path_unread,messageFolder)
-        view_unread_message(path_messageFolder,i)
+        print_unreadMessageList(path_messageFolder,i)
         i+=1
-    # dc thì tách phần dưới ra dùm t, thấy dở quá 
-    choice = int(input('Bạn muốn đọc Email thứ mấy: '))
-    if(choice<=len(read_list)):
-        return os.path.join(path_read,read_list[choice-1])
-    else: return os.path.join(path_unread,unread_list[choice-1-len(read_list)])
-         
 
+#in nội dung tin nhắn thứ index
+def print_message(path_folder,index): 
+    path_read = os.path.join(path_folder,"Read")
+    read_list = danh_sach_thu_muc(path_read)
+    path_unread = os.path.join(path_folder,"Unread")
+    unread_list = danh_sach_thu_muc(path_unread)
+    if(index<=len(read_list)):
+        path_message = os.path.join(path_read,read_list[index-1])
+    else: path_message = os.path.join(path_unread,unread_list[index-1-len(read_list)])
+    fileList = danh_sach_tap_tin(path_message)
+    subjectFile=''
+    for fileName in fileList:
+        if fileName.find('.') == -1: 
+            subjectFile = fileName
+            break
+    path_subjectFile = os.path.join(path_message,subjectFile)
+    with open(path_subjectFile, 'r') as subject_file:
+        print(subject_file.read())
+    return path_message
+
+#kiểm tra message có tập đính kèm hay không 
+def check_attachmentFile(path_message):
+    attachmentList = []
+    fileList = danh_sach_tap_tin(path_message)
+    for fileName in fileList:
+        if fileName.find('.') != -1: 
+            path_attachmentFile = os.path.join(path_message,fileName)
+            attachmentList.append(path_attachmentFile)
+    return attachmentList
+
+def change_location_file(source_path,destination_path):
+    shutil.move(source_path, destination_path)
