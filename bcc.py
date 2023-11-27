@@ -7,27 +7,27 @@ def send_email_bcc_with_attachments(sender_email, recipient_email, subject, body
         # Connect to the SMTP server
         client_socket.connect(('localhost', 2225))
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send EHLO command
         client_socket.sendall(b'EHLO example.com\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send MAIL FROM command
         client_socket.sendall(f'MAIL FROM: <{sender_email}>\r\n'.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send RCPT TO command
         client_socket.sendall(f'RCPT TO: <{recipient_email}>\r\n'.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send DATA command
         client_socket.sendall(b'DATA\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Construct the email message with attachments
         email_message = (
@@ -70,12 +70,12 @@ def send_email_bcc_with_attachments(sender_email, recipient_email, subject, body
         # Send the email message
         client_socket.sendall(email_message.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send QUIT command
         client_socket.sendall(b'QUIT\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
 # send_email_bcc_with_attachments(
 #     sender_email= "qknetwork41@gmail.com",

@@ -12,34 +12,34 @@ def send_email_to_cc_with_attachments(sender_email, to_email_list, cc_email_list
         # Connect to the SMTP server
         client_socket.connect(('localhost', 2225))
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send EHLO command
         client_socket.sendall(b'EHLO example.com\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send MAIL FROM command
         client_socket.sendall(f'MAIL FROM: <{sender_email}>\r\n'.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send RCPT TO command for the primary recipient
         for to_email in to_email_list:
             client_socket.sendall(f'RCPT TO: <{to_email}>\r\n'.encode())
             response = client_socket.recv(1024).decode()
-            print(response)
+            #print(response)
 
         # Send RCPT TO command for the CC recipients
         for cc_email in cc_email_list:
             client_socket.sendall(f'RCPT TO: <{cc_email}>\r\n'.encode())
             response = client_socket.recv(1024).decode()
-            print(response)
+            #print(response)
 
         # Send DATA command
         client_socket.sendall(b'DATA\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Construct the email message with attachments
         email_message = (
@@ -83,12 +83,12 @@ def send_email_to_cc_with_attachments(sender_email, to_email_list, cc_email_list
         # Send the email message
         client_socket.sendall(email_message.encode())
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send QUIT command
         client_socket.sendall(b'QUIT\r\n')
         response = client_socket.recv(1024).decode()
-        print(response)
+        #print(response)
 
 # Example usage:
 # send_email_to_cc_with_attachments(

@@ -13,20 +13,20 @@ def retrieve_email_with_attachment_socket( username, password):
         pop_conn.connect(('localhost', 3335))
 
         response = pop_conn.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Send user credentials
         pop_conn.sendall(f'USER {username}\r\n'.encode())
         response = pop_conn.recv(1024).decode()
-        print(response)
+        #print(response)
 
         pop_conn.sendall(f'PASS {password}\r\n'.encode())
         response = pop_conn.recv(1024).decode()
-        print(response)
+        #print(response)
         # Get the number of messages in the mailbox
         pop_conn.sendall(b'LIST\r\n')
         response = pop_conn.recv(1024).decode()
-        print(response)
+        #print(response)
 
         # Get the number of messages in the mailbox
         num_messages = len(response.splitlines())-2
@@ -56,11 +56,12 @@ def retrieve_email_with_attachment_socket( username, password):
 
             paths_folder = folder_filtering(email_content,project_keywords,important_keywords,work_keywords,spam_keywords)
             for path in paths_folder:
-                print(path)
+                #print(path)
                 pathMessage = path_message(path) # tạo folder message mới 
                 newFile = email_content[email_content.find('Subject: ')+9:email_content.find('From: ')-2]
                    
                 path_newFile = os.path.join(pathMessage,newFile)
+                #print(path_newFile)
                 with open(path_newFile, 'w') as attachment_file:
                     attachment_file.write(email_content)  
 
@@ -69,18 +70,18 @@ def retrieve_email_with_attachment_socket( username, password):
                     path_attachment = os.path.join(pathMessage,attachmentName)
                     with open(path_attachment, 'wb') as attachment_file:
                         attachment_file.write(base64.b64decode(email_content_list[i+1]))   
-                        print(f"Attachment saved: {attachmentName}")
+                        #print(f"Attachment saved: {attachmentName}")
                 
         # Quit the session
         pop_conn.sendall(b'QUIT\r\n')
         response = pop_conn.recv(1024).decode()
-        print(response)
+        #print(response)
 
 # # Set your POP3 server details
 
 # pop3_username = 'qknetwork41@gmail.com'
 # pop3_password = '25092004'  # Consider using app-specific password for security
 
-# # Call the retrieve_email_with_attachment_socket function
+# Call the retrieve_email_with_attachment_socket function
 # retrieve_email_with_attachment_socket( pop3_username, pop3_password)
 

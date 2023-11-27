@@ -6,6 +6,7 @@ from path_handling import print_message
 from path_handling import check_attachmentFile
 from path_handling import change_location_file
 from path_handling import count_messageInFolder
+from POP3_email import retrieve_email_with_attachment_socket
 
 
 
@@ -37,21 +38,7 @@ class EmailClient:
         print("Đây là danh sách các folder trong mailbox của bạn: ")
         listFolder = danh_sach_thu_muc(r"D:\MailBox")
         for i in range(0,len(listFolder)):
-            print(i+1,listFolder[i])
-        
-
-    def read_email(self, index):
-        email = self.inbox[index - 1]
-        print(f"Nội dung email của email thứ {index}:")
-        print(email.content)
-
-        if email.attachments:
-            save_attachments = input("Trong email này có attached file, bạn có muốn save không: ").lower() == 'có'
-            if save_attachments:
-                for i, attachment in enumerate(email.attachments, start=1):
-                    save_path = input(f"Cho biết đường dẫn bạn muốn lưu file thứ {i}: ")
-                    # Lưu file tại đường dẫn save_path
-                    print(f"Đã lưu file {attachment} tại {save_path}")
+            print(i+1,listFolder[i])  
 
     def run(self):
         while True:
@@ -59,10 +46,10 @@ class EmailClient:
             print("1. Để gửi email")
             print("2. Để xem danh sách các email đã nhận")
             print("3. Thoát")
-
             choice = input("Bạn chọn: ")
             if choice == '1':
                 self.send_email()
+                retrieve_email_with_attachment_socket(sender_email, password)
             elif choice == '2':
                 self.view_inbox()
                 choice = int(input("Bạn muốn xem email trong folder nào: "))
@@ -82,20 +69,15 @@ class EmailClient:
                         print("Nội dung email của email thứ",choice)
                         path_message = print_message(path_folder,choice)
                         list_attachmentFile = check_attachmentFile(path_message)
-                        if list_attachmentFile:
+                        if len(list_attachmentFile) != 0:
                             if input("Trong email này có attached file, bạn có muốn save không: ") == 'có':
                                 destination_path = input("Cho biết đường dẫn bạn muốn lưu: ")
                                 for path_file in list_attachmentFile:
                                     change_location_file(path_file,destination_path)
+                                    print(f"Đã lưu file tại {destination_path}")          
                 else:
                     print("Không có email nào trong folder này.")
                 
-
-                # if folder_choice == '':
-                #     continue
-                # folder_index = int(folder_choice)
-                # if 1 <= folder_index <= len(self.inbox):
-                #     self.read_email(folder_index)
             elif choice == '3':
                 break
             else:
