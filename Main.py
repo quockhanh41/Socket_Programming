@@ -29,9 +29,9 @@ class EmailClient:
             for i in range(num_attachments):
                 attachment_path = input(f"Cho biết đường dẫn file thứ {i + 1}: ")
                 attachments.append(attachment_path)
-            send_email_to_cc_with_attachments(sender_email,to_addresses,cc_addresses,subject,content,attachments)
+            send_email_to_cc_with_attachments(sender_email,to_addresses,cc_addresses,subject,content,attachments,smtp_host)
             for i in range(0,len(bcc_addresses)):
-                    send_email_bcc_with_attachments(sender_email,bcc_addresses[i],subject,content,attachments)
+                    send_email_bcc_with_attachments(sender_email,bcc_addresses[i],subject,content,attachments,smtp_host)
             print("Đã gửi email thành công")
 
     def view_inbox(self):
@@ -49,7 +49,7 @@ class EmailClient:
             choice = input("Bạn chọn: ")
             if choice == '1':
                 self.send_email()
-                retrieve_email_with_attachment_socket(sender_email, password)
+                retrieve_email_with_attachment_socket(sender_email, password,pop3_host)
             elif choice == '2':
                 self.view_inbox()
                 choice = int(input("Bạn muốn xem email trong folder nào: "))
@@ -88,5 +88,7 @@ if __name__ == "__main__":
     # password =input("Nhập mật khẩu: ")
     sender_email ='qknetwork41@gmail.com'
     password ="khanh0401"
+    smtp_host = 'localhost'
+    pop3_host = 'localhost'
     email_client = EmailClient()
     email_client.run()

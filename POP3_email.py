@@ -8,9 +8,9 @@ from path_handling import folder_filtering
 def getAttachmentName(s): 
     return s[s.find('"')+1:len(s)-1]
 
-def retrieve_email_with_attachment_socket( username, password):
+def retrieve_email_with_attachment_socket( username, password,pop3_host):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as pop_conn:
-        pop_conn.connect(('localhost', 3335))
+        pop_conn.connect((pop3_host, 3335))
 
         response = pop_conn.recv(1024).decode()
         #print(response)

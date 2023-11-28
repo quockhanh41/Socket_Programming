@@ -3,14 +3,14 @@ import socket
 import os
 
     
-def send_email_to_cc_with_attachments(sender_email, to_email_list, cc_email_list,  subject, body, attachment_paths):
+def send_email_to_cc_with_attachments(sender_email, to_email_list, cc_email_list,  subject, body, attachment_paths,smtp_host):
     # Convert lists to strings for headers
     to_header = ', '.join(to_email_list) if to_email_list else ''
     cc_header = ', '.join(cc_email_list) if cc_email_list else ''
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         # Connect to the SMTP server
-        client_socket.connect(('localhost', 2225))
+        client_socket.connect((smtp_host, 2225))
         response = client_socket.recv(1024).decode()
         #print(response)
 

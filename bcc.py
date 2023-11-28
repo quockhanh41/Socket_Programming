@@ -2,10 +2,10 @@ import base64
 import socket
 import os
 
-def send_email_bcc_with_attachments(sender_email, recipient_email, subject, body, attachment_paths):
+def send_email_bcc_with_attachments(sender_email, recipient_email, subject, body, attachment_paths,smtp_host):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         # Connect to the SMTP server
-        client_socket.connect(('localhost', 2225))
+        client_socket.connect((smtp_host, 2225))
         response = client_socket.recv(1024).decode()
         #print(response)
 
