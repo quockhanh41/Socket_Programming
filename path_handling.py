@@ -1,138 +1,82 @@
 import os
-import shutil
+import base64
+def create_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-def danh_sach_thu_muc(duong_dan):
-    danh_sach_thu_muc = []
-    for ten in os.listdir(duong_dan):
-        duong_dan_day_du = os.path.join(duong_dan, ten)
-        if os.path.isdir(duong_dan_day_du):
-            danh_sach_thu_muc.append(ten)
-    return danh_sach_thu_muc
+def create_user_folder(email):
+    folders=["Inbox","Project","Important","Work","Spam"]
+    path="D:\Gmail\\"+email
+    create_folder(path)
+    for folder in folders:
+        create_folder(path+f"\\{folder}")
+        create_folder(path+f"\\{folder}"+"\\Unread")
+        create_folder(path+f"\\{folder}"+"\\Read")
 
-def danh_sach_tap_tin(duong_dan):
-    danh_sach_tap_tin = []
-    for ten in os.listdir(duong_dan):
-        danh_sach_tap_tin.append(ten)
-    return danh_sach_tap_tin
-def path_message(path_folder):
-    amount_message_cur = len(danh_sach_thu_muc(path_folder))
-    newFolder = 'Message ' + str(amount_message_cur +1 ) 
-    path_newFolder = os.path.join(path_folder,newFolder) 
-    if not os.path.exists(path_newFolder):
-        os.makedirs(path_newFolder)
-    return path_newFolder
+def getFileList(folder_path):
+    files = os.listdir(folder_path)
+    file_names = [os.path.basename(file) for file in files]
+    return file_names
 
-# 1 tin nhắn có thể nằm trong nhiều chủ đề     
-def folder_filtering(content,project_keywords,important_keywords,work_keywords,spam_keywords):
-    list_folder=[]
-    From = content[content.find('From: ') + 6:content.find('To: ') - 2]
-    Subject = content[content.find('Subject: ') + 9:content.find('From: ') - 2]
-    Body = content[content.find('Content: ') + 9:]
-    for project_keyword in project_keywords:
-        if From == project_keyword:
-            list_folder.append(r"D:\MailBox\Project\Unread")
-            break
-    for important_keyword in important_keywords:
-        if Subject.find(important_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Important\Unread")
-            break
-    for work_keyword in work_keywords:
-        if Body.find(work_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Work\Unread")
-            break
-    for spam_keyword in spam_keywords:
-        if Body.find(spam_keyword)!= -1 or Subject.find(spam_keyword) != -1:
-            list_folder.append(r"D:\MailBox\Spam\Unread")
-            break
-    if not list_folder:
-        list_folder.append(r"D:\MailBox\Inbox\Unread")
-    return list_folder
+def printMsgList(file_list,sender_email,choice,status):
+    folder=["Inbox","Project","Important","Work","Spam"]
+    sender_list=[]
+    subject_list=[]
+    for file in file_list:
+        sender_list.append(getSender(f'D:\\Gmail\\{sender_email}\\{folder[choice-1]}\\{status}\\{file}'))
+        subject_list.append(getSubject(f'D:\\Gmail\\{sender_email}\\{folder[choice-1]}\\{status}\\{file}'))
+    for i in range(0,len(sender_list)):
+        if(status=='Unread'):
+            print('(chưa đọc)<'+sender_list[i]+'>,<'+subject_list[i]+'>')
+        elif(status=='Read'): 
+            print('<'+sender_list[i]+'>,<'+subject_list[i]+'>')
 
-def print_readMessageList(path_folder,i):
-    fileList = danh_sach_tap_tin(path_folder)
-    subjectFile=''
-    for path in fileList:
-        if path.find('.') == -1: 
-            #vì tên file không dc đặt có dấu '.' 
-            #nên file không có dấu '.' là file subject
-            subjectFile = path
-            break
-    # read() file subject và print
-    path_subjectFile = os.path.join(path_folder,subjectFile)
-    with open(path_subjectFile, 'r') as subject_file:
-        content = subject_file.read()
-        subject = content[content.find('Subject: ')+9:content.find('From: ')-2]
-        sender = content[content.find('From: ')+6:content.find('To: ')-2]
-        print(str(i)+'.',sender,subject)
+def getSender(msg_path):
+    with open(msg_path,'r') as file:
+        email_content=file.read()
+    sender=email_content[email_content.find('From: ')+6:email_content.find('To: ')-2]
+    return sender
 
-def print_unreadMessageList(path_folder,i):
-    fileList = danh_sach_tap_tin(path_folder)
-    subjectFile=''
-    for path in fileList:
-        if path.find('.') == -1:
-            subjectFile = path
-            break
-    path_subjectFile = os.path.join(path_folder,subjectFile)
-    with open(path_subjectFile, 'r') as subject_file:
-        content = subject_file.read()
-        subject = content[content.find('Subject: ')+9:content.find('From: ')-2]
-        sender = content[content.find('From: ')+6:content.find('To: ')-2]
-        print(str(i)+'. (chưa đọc)',sender,subject)
-    
-def count_messageInFolder(path_folder):
-    count = 0
-    path_read = os.path.join(path_folder,"Read")
-    count += len(danh_sach_tap_tin(path_read))
-    path_unread = os.path.join(path_folder,"Unread")
-    count += len(danh_sach_tap_tin(path_unread))
-    return count
+def getRecipient(msg_path):
+    with open(msg_path,'r',newline='\n') as file:
+        email_content=file.read()
+    recipient_list=email_content[email_content.find('To: '):email_content.find('MIME-Version: ')-2]
+    return recipient_list
 
-# hiện trạng thái tn, ng gửi và subject tất cả các tin nhắn 
-# và trả lại đường dẫn tin nhắn muốn mở 
-def print_MessageList(path_folder):
-    path_read = os.path.join(path_folder,"Read")
-    read_list = danh_sach_thu_muc(path_read)
-    i = 1
-    for messageFolder in read_list:
-        path_messageFolder = os.path.join(path_read,messageFolder)
-        print_readMessageList(path_messageFolder,i)
-        i+=1
-    path_unread = os.path.join(path_folder,"Unread")
-    unread_list = danh_sach_thu_muc(path_unread)
-    for messageFolder in unread_list:
-        path_messageFolder = os.path.join(path_unread,messageFolder)
-        print_unreadMessageList(path_messageFolder,i)
-        i+=1
+def getSubject(msg_path):
+    with open(msg_path,'r') as file:
+        email_content=file.read()
+    subject=email_content[email_content.find('Subject: ')+9:email_content.find('From: ')-2]
+    return subject
 
-#in nội dung tin nhắn thứ index
-def print_message(path_folder,index): 
-    path_read = os.path.join(path_folder,"Read")
-    read_list = danh_sach_thu_muc(path_read)
-    path_unread = os.path.join(path_folder,"Unread")
-    unread_list = danh_sach_thu_muc(path_unread)
-    if(index<=len(read_list)):
-        path_message = os.path.join(path_read,read_list[index-1])
-    else: path_message = os.path.join(path_unread,unread_list[index-1-len(read_list)])
-    fileList = danh_sach_tap_tin(path_message)
-    subjectFile=''
-    for fileName in fileList:
-        if fileName.find('.') == -1: 
-            subjectFile = fileName
-            break
-    path_subjectFile = os.path.join(path_message,subjectFile)
-    with open(path_subjectFile, 'r') as subject_file:
-        print(subject_file.read())
-    return path_message
+def getBody(msg_path):
+    with open(msg_path,'r',newline='\n') as file:
+        email_content=file.read()
+    email_content_list=email_content.split('--my_boundary')
+    body=email_content_list[1][email_content_list[1].find('charset="utf-8"')+18:email_content_list[1].rfind('\r\n')-4]
+    return body
 
-#kiểm tra message có tập đính kèm hay không 
-def check_attachmentFile(path_message):
-    attachmentList = []
-    fileList = danh_sach_tap_tin(path_message)
-    for fileName in fileList:
-        if fileName.find('.') != -1: 
-            path_attachmentFile = os.path.join(path_message,fileName)
-            attachmentList.append(path_attachmentFile)
-    return attachmentList
+def getFile(msg_path):
+    with open(msg_path,'r',newline='\n') as file:
+        email_content=file.read()
+    email_content_list=email_content.split('--my_boundary')
+    file_list=[]
+    for i in range(2,len(email_content_list)-1):
+        filename=email_content_list[i][email_content_list[i].find('filename="')+10:email_content_list[i].rfind('"')]
+        file_data=email_content_list[i][email_content_list[i].rfind('"')+7:email_content_list[i].rfind('--my_boundary')-2]
+        file_list.append([filename,file_data])
+    return file_list
 
-def change_location_file(source_path,destination_path):
-    shutil.move(source_path, destination_path)
+def getEmail(msg_path):
+    email= f'Subject: {getSubject(msg_path)}\r\nFrom: {getSender(msg_path)}\r\n{getRecipient(msg_path)}\r\nContent: {getBody(msg_path)}\r\n'
+    file_list=getFile(msg_path)
+    for file in file_list:
+        filename,file_data=file
+        email+=f'File: {filename}\r\n'
+    return email,file_list
+
+def downloadFile(file,path):
+    filename,file_data=file
+    path+=f'\\{filename}'
+    with open(path, 'wb') as attachment_file:
+        attachment_file.write(base64.b64decode(file_data))
